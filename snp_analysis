@@ -41,7 +41,7 @@ java -jar gatk-package-4.1.4.1-local.jar GenotypeGVCFs -R genome.fasta --variant
 java -jar gatk-package-4.1.4.1-local.jar SelectVariants -R genome.fasta
 --variant MRQ76.gatk.raw.vcf --concordance fbayes_MRQ76.vcf -O MRQ76.cc.var.vcf;
 
-#select variants
+#split/select variants
 java -jar gatk-package-4.0.8.1-local.jar SelectVariants -R genome.fasta 
 -V MRQ76.cc.var.vcf --select-type-to-include INDEL -O INDEL.vcf
 java -jar gatk-package-4.0.8.1-local.jar SelectVariants -R genome.fasta 
@@ -54,14 +54,14 @@ java -jar gatk-package-4.0.8.1-local.jar VariantFiltration -R genome.fasta -V va
 --filter-name FilterMQRankSum --filter-expression "MQRankSum < -1.65" --filter-name FilterReadPosRankSum 
 --filter-expression "ReadPosRankSum < -1.65" -O variants.concordance.flt1.vcf #gatk
 
-grep -vP "\tFilter" variants.concordance.flt1.vcf > variants.concordance.filter1.vcf
-
-vcftools --minDP 10 --min-alleles 2 --max-alleles 2 --non-ref-af 0.9 --vcf SNP.vcf --recode --recode-INFO-all 
+vcftools --non-ref-af 0.9 --vcf SNP.vcf --recode --recode-INFO-all 
 --out SNP_fltr.vcf #vcftools
 
 #vcf to txt
 java -jar gatk-package-4.1.4.1-local.jar VariantsToTable -V COV1-1.var.gatk.sam.cc.raw.vcf 
 -F CHROM -F REF -F ALT -F QUAL -F POS -GF GT -GF AD -GF DP -GF GQ -GF PL -O COV1-1.output.table 
+
+#hard filter using R
 
 #snp annotation
 java -jar snpEff.jar Oryza_sativa ./examples/file.vcf > out.vcf
