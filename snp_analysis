@@ -32,6 +32,8 @@ freebayes -f ../ref_genome/japonica.fasta MRQ76.sort.rg.mdup.fx.bam > fbayes_MRQ
 #if combine sample
 java -jar gatk-package-4.1.4.1-local.jar CombineGVCFs -R genome.fasta
 --variant MRQ76.raw.vcf --variant MR297.raw.vcf  -O white_cohort_gatk_raw.vcf
+nohup java -jar ~/bioinfo_sware/gatk-4.1.4.1/gatk-package-4.1.4.1-local.jar CombineGVCFs 
+-R /home/mardi/Desktop/rice/ref_genome/R498_Chr.fasta --variant input.list -O amylose.cohort.gatk.raw.vcf & #if too many files
 
 #call true variants
 java -jar gatk-package-4.1.4.1-local.jar GenotypeGVCFs -R genome.fasta --variant white_cohort_gatk_raw.vcf 
