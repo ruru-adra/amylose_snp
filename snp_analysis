@@ -74,6 +74,9 @@ cat ann_bali_snp.vcf | ./scripts/vcfEffOnePerLine.pl | java -jar SnpSift.jar ext
 #genome stats
 samtools flagstat sample.bam > stats.out
 
+#count unmapped reads
+samtools view -f4 -c in.bam
+
 #get number of reads
 samtools idxstats sample.bam | awk '{s+=$3+$4} END {print s}'
 
@@ -85,7 +88,7 @@ samtools depth sample_bwa.bam | head
 
 #extract mapped reads
 samtools view -h -F 4 -b sample.bam > sample_mapped.bam
-samtools view -f 4 sample.bam > sample_unmapped.bam
+samtools view -b -f 4 sample.bam > sample_unmapped.bam
 
 #split unmapped bam into fastq paired-end
 bamToFastq -bam sampe_unmapped.bam -fq1 unmapped_reads1.fastq -fq2 unmapped_reads2.fastq
