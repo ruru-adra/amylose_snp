@@ -69,7 +69,7 @@ java -jar gatk-package-4.1.4.1-local.jar VariantsToTable -V COV1-1.var.gatk.sam.
 java -jar snpEff.jar Oryza_sativa ./examples/file.vcf > out.vcf
 
 cat ann_bali_snp.vcf | ./scripts/vcfEffOnePerLine.pl | java -jar SnpSift.jar extractFields - CHROM POS REF ALT 
-"ANN[*].EFFECT" "ANN[*].GENE" > ann_bali_snp_per_line.txt
+"ANN[*].EFFECT" "ANN[*].GENE" "ANN[*].AA" > ann_bali_snp_per_line.txt
 
 #genome stats
 samtools flagstat sample.bam > stats.out
