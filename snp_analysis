@@ -39,6 +39,10 @@ nohup java -jar ~/bioinfo_sware/gatk-4.1.4.1/gatk-package-4.1.4.1-local.jar Comb
 java -jar gatk-package-4.1.4.1-local.jar GenotypeGVCFs -R genome.fasta --variant white_cohort_gatk_raw.vcf 
 -O white_gatk_variants.vcf
 
+#bfr concordance
+java -jar ~/bioinfo_sware/gatk-4.1.8.0/gatk-package-4.1.8.0-local.jar IndexFeatureFile -I MASRIA.filter.snp.vcf 
+
+
 #concordance
 java -jar gatk-package-4.1.4.1-local.jar SelectVariants -R genome.fasta
 --variant MRQ76.gatk.raw.vcf --concordance fbayes_MRQ76.vcf -O MRQ76.cc.var.vcf;
