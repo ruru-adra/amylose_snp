@@ -75,6 +75,9 @@ java -jar snpEff.jar Oryza_sativa ./examples/file.vcf > out.vcf
 cat ann_bali_snp.vcf | ./scripts/vcfEffOnePerLine.pl | java -jar SnpSift.jar extractFields - CHROM POS REF ALT 
 "ANN[*].EFFECT" "ANN[*].GENE" "ANN[*].AA" > ann_bali_snp_per_line.txt
 
+cat snpeff_ann_amylose_cohort.vcf | /home/mardi/bioinfo_sware/snpEff/scripts/vcfEffOnePerLine.pl | java -jar /home/mardi/bioinfo_sware/snpEff/SnpSift.jar  
+extractFields - CHROM POS REF ALT "ANN[*].EFFECT" "ANN[*].GENE" "ANN[*].AA" "ANN[*].AA_POS" "ANN[*].IMPACT" "ANN[*].RANK"  >
+
 #genome stats
 samtools flagstat sample.bam > stats.out
 
