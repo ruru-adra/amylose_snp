@@ -60,8 +60,18 @@ java -jar gatk-package-4.0.8.1-local.jar VariantFiltration -R genome.fasta -V va
 --filter-name FilterMQRankSum --filter-expression "MQRankSum < -1.65" --filter-name FilterReadPosRankSum 
 --filter-expression "ReadPosRankSum < -1.65" -O variants.concordance.flt1.vcf #gatk
 
-vcftools --non-ref-af 0.9 --vcf SNP.vcf --recode --recode-INFO-all 
---out SNP_fltr.vcf #vcftools
+ReadPosRankSum of < −2.0, MQRankSum < −2.0, 
+polymorphism confidence scores (QUAL) < 30.0 
+genotype call quality divided by depth (QD) < 3.0
+Phred-scaled P-value of Fisher exact test for strand (FS) > 30.0
+mapping quality (MQ) < 30.0 
+total depth of coverage (DP) < 100
+genotype-filter-expression depth of coverage (DP) < 5
+genotype-filter-expression genotype call quality (GQ) < 10.0
+
+#vcftools
+vcftools --non-ref-af 0.9 --vcf SNP.vcf --recode --recode-INFO-all --out SNP_fltr.vcf 
+vcftools --vcf SNP.vcf –minGQ 5 –maf 0.01 –max-missing 0.8 –recode–recode-INFO-all --out SNP_rcd.vcf
 
 #vcf to txt
 java -jar gatk-package-4.1.4.1-local.jar VariantsToTable -V COV1-1.var.gatk.sam.cc.raw.vcf 
