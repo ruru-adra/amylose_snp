@@ -1,3 +1,5 @@
+#hapmap disable sc notation >options(scipen = 999)
+
 #Quality control
 fastp -i MRQ76_1.fastq -I MRQ76_2.fastq -o cleanMRQ76_1.fastq -O cleanMRQ76_2.fastq -w 4
 
