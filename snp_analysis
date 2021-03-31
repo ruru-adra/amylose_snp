@@ -112,3 +112,14 @@ samtools view -b -f 4 sample.bam > sample_unmapped.bam
 #split unmapped bam into fastq paired-end
 bamToFastq -bam sampe_unmapped.bam -fq1 unmapped_reads1.fastq -fq2 unmapped_reads2.fastq
 bedtools bamtofastq –i out.mappedSorted.bam –fq R1.fastq –fq2 R2.fastq
+
+#flanking region
+$ cat test.fa
+>chr1
+AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+$ cat test.bed
+chr1 5 10 myseq
+
+$ bedtools getfasta -fi test.fa -bed test.bed -name -tab
+myseq AAACC
