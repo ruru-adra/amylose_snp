@@ -1,3 +1,5 @@
+export PATH=$PATH:$HOME/bioinfo_sware/sratoolkit.3.1.0-ubuntu64/bin #export PATH to bin
+
 fastq-dump --gzip --split-3 SRR21151344 #download and split SRA 
 
 #hapmap disable sc notation >options(scipen = 999)
