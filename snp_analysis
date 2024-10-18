@@ -1,8 +1,10 @@
-export PATH=$PATH:$HOME/bioinfo_sware/sratoolkit.3.1.0-ubuntu64/bin #export PATH to bin
+#export PATH to bin
+export PATH=$PATH:$HOME/bioinfo_sware/sratoolkit.3.1.0-ubuntu64/bin 
 
-fastq-dump --split-spot --split-files SRR16760542 #download and split SRA 
+#download and split SRA 
+fastq-dump --split-spot --split-files SRR16760542
 
-#hapmap disable sc notation >options(scipen = 999)
+#hapmap disable sc notation options(scipen = 999)
 
 ###Quality control
 ```r
@@ -11,10 +13,10 @@ fastp -i MRQ76_1.fastq -I MRQ76_2.fastq -o cleanMRQ76_1.fastq -O cleanMRQ76_2.fa
 
 #Alignment (bwa) - hisat2 for RNA-seq
 bwa mem -M -t 10 ref_genome.fasta cleanMRQ76_1.fastq cleanMRQ76_2.fastq > MRQ76_map.sam
+bwa mem -M -t 16 nelore.fa  CL100006973_r1.fq.gz CL100006973_r2.fq.gz | samtools sort > cholistani.sort.bam
 
 #Sam2sort_bam
-java -jar gatk-package-4.1.4.1-local.jar SortSam -I MRQ76_map.sam
--O MRQ76.sort.bam -SO coordinate --CREATE_INDEX true
+java -jar gatk-package-4.1.4.1-local.jar SortSam -I MRQ76_map.sam -O MRQ76.sort.bam -SO coordinate --CREATE_INDEX true
 
 #add read group
 java -jar picard.jar AddOrReplaceReadGroups I=MRQ76.sort.bam O=MRQ76.sort.rg.bam 
@@ -32,24 +34,27 @@ samtools faidx genome.fasta
 java -jar gatk-package-4.0.8.1-local.jar CreateSequenceDictionary -R genome.fasta -O genome.dict
 
 #Variant Calling
+#gatk
 java -jar gatk-package-4.0.8.1-local.jar HaplotypeCaller -R genome.fasta -I MRQ76.sort.rg.mdup.fx.bam
--O MRQ76.gatk.raw.vcf -ERC GVCF --ploidy 2 #gatk
-
-freebayes -f ../ref_genome/japonica.fasta MRQ76.sort.rg.mdup.fx.bam > fbayes_MRQ76.vcf #freebayes
-
-#if combine sample
-java -jar gatk-package-4.1.4.1-local.jar CombineGVCFs -R genome.fasta
---variant MRQ76.raw.vcf --variant MR297.raw.vcf  -O white_cohort_gatk_raw.vcf
-nohup java -jar ~/bioinfo_sware/gatk-4.1.4.1/gatk-package-4.1.4.1-local.jar CombineGVCFs 
--R /home/mardi/Desktop/rice/ref_genome/R498_Chr.fasta --variant input.list -O amylose.cohort.gatk.raw.vcf & #if too many files
+-O MRQ76.gatk.raw.vcf -ERC GVCF --ploidy 2
 
 #call true variants
 java -jar gatk-package-4.1.4.1-local.jar GenotypeGVCFs -R genome.fasta --variant white_cohort_gatk_raw.vcf 
 -O white_gatk_variants.vcf
 
+#freebayes
+freebayes -f ../ref_genome/japonica.fasta MRQ76.sort.rg.mdup.fx.bam > fbayes_MRQ76.vcf
+
+#if combine sample
+java -jar gatk-package-4.1.4.1-local.jar CombineGVCFs -R genome.fasta
+--variant MRQ76.raw.vcf --variant MR297.raw.vcf  -O white_cohort_gatk_raw.vcf
+
+#if too many files
+java -jar ~/bioinfo_sware/gatk-4.1.4.1/gatk-package-4.1.4.1-local.jar CombineGVCFs 
+-R /home/mardi/Desktop/rice/ref_genome/R498_Chr.fasta --variant input.list -O amylose.cohort.gatk.raw.vcf
+
 #bfr concordance
 java -jar ~/bioinfo_sware/gatk-4.1.8.0/gatk-package-4.1.8.0-local.jar IndexFeatureFile -I MASRIA.filter.snp.vcf 
-
 
 #concordance
 java -jar gatk-package-4.1.4.1-local.jar SelectVariants -R genome.fasta
@@ -60,6 +65,10 @@ java -jar gatk-package-4.0.8.1-local.jar SelectVariants -R genome.fasta
 -V MRQ76.cc.var.vcf --select-type-to-include INDEL -O INDEL.vcf
 java -jar gatk-package-4.0.8.1-local.jar SelectVariants -R genome.fasta 
 -V MRQ76.cc.var.vcf --select-type-to-include SNP -O SNP.vcf
+
+#vcf to txt
+java -jar gatk-package-4.1.4.1-local.jar VariantsToTable -V COV1-1.var.gatk.sam.cc.raw.vcf 
+-F CHROM -F REF -F ALT -F QUAL -F POS -GF GT -GF AD -GF DP -GF GQ -GF PL -O COV1-1.output.table
 
 #variant filtering
 java -jar gatk-package-4.0.8.1-local.jar VariantFiltration -R genome.fasta -V variants.concordance.raw1.vcf 
@@ -77,15 +86,11 @@ total depth of coverage (DP) < 100
 genotype-filter-expression depth of coverage (DP) < 5
 genotype-filter-expression genotype call quality (GQ) < 10.0
 
+#hard filter using R
+
 #vcftools
 vcftools --non-ref-af 0.9 --vcf SNP.vcf --recode --recode-INFO-all --out SNP_fltr.vcf 
 vcftools --vcf SNP.vcf –minGQ 5 –maf 0.01 –max-missing 0.8 –recode–recode-INFO-all --out SNP_rcd.vcf
-
-#vcf to txt
-java -jar gatk-package-4.1.4.1-local.jar VariantsToTable -V COV1-1.var.gatk.sam.cc.raw.vcf 
--F CHROM -F REF -F ALT -F QUAL -F POS -GF GT -GF AD -GF DP -GF GQ -GF PL -O COV1-1.output.table 
-
-#hard filter using R
 
 #snp annotation
 java -jar snpEff.jar Oryza_sativa ./examples/file.vcf > out.vcf
@@ -118,14 +123,3 @@ samtools view -b -f 4 sample.bam > sample_unmapped.bam
 #split unmapped bam into fastq paired-end
 bamToFastq -bam sampe_unmapped.bam -fq1 unmapped_reads1.fastq -fq2 unmapped_reads2.fastq
 bedtools bamtofastq –i out.mappedSorted.bam –fq R1.fastq –fq2 R2.fastq
-
-#flanking region
-$ cat test.fa
->chr1
-AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
-
-$ cat test.bed
-chr1 5 10 myseq
-
-$ bedtools getfasta -fi test.fa -bed test.bed -name -tab
-myseq AAACC
