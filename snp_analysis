@@ -15,6 +15,10 @@ fastp -i MRQ76_1.fastq -I MRQ76_2.fastq -o cleanMRQ76_1.fastq -O cleanMRQ76_2.fa
 bwa mem -M -t 10 ref_genome.fasta cleanMRQ76_1.fastq cleanMRQ76_2.fastq > MRQ76_map.sam
 bwa mem -M -t 16 nelore.fa  CL100006973_r1.fq.gz CL100006973_r2.fq.gz | samtools sort > cholistani.sort.bam
 
+#Merge SAM/BAM files
+java -jar ~/bioinfo_sware/gatk-4.6.0.0/gatk-package-4.6.0.0-local.jar MergeSamFiles I=br1.sort.bam I=br2.sort.bam I=br3.sort.bam 
+O=brahman_merged_files.bam
+
 #Sam2sort_bam
 java -jar gatk-package-4.1.4.1-local.jar SortSam -I MRQ76_map.sam -O MRQ76.sort.bam -SO coordinate --CREATE_INDEX true
 
