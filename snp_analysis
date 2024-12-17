@@ -1,3 +1,6 @@
+#rename bulk files
+mmv "*.SNP.vcf.out.txt" "#1.SNP.txt"
+
 #export PATH to bin
 export PATH=$PATH:$HOME/bioinfo_sware/sratoolkit.3.1.0-ubuntu64/bin 
 
